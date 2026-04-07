@@ -1,0 +1,8 @@
+[project]
+name = "coder-and-claude-on-eks-demo-app"
+version = "0.1.0"
+description = "Doc-chat demo app monorepo (FastAPI + React + CDK)"
+requires-python = ">=3.12"
+
+[tool.uv.workspace]
+members = ["packages/api"]

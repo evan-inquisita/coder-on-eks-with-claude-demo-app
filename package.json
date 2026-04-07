@@ -1,0 +1,14 @@
+{
+  "name": "coder-and-claude-on-eks-demo-app",
+  "private": true,
+  "version": "0.1.0",
+  "license": "MIT",
+  "workspaces": [
+    "packages/website",
+    "packages/cdk"
+  ],
+  "scripts": {
+    "test": "npm test --workspaces --if-present",
+    "build": "npm run build --workspaces --if-present"
+  }
+}
