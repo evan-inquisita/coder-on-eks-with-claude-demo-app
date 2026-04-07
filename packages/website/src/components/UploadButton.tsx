@@ -1,5 +1,5 @@
-import React from 'react';
-import { uploadDocument } from '../api';
+import React from "react";
+import { uploadDocument } from "../api";
 
 interface Props {
   onUploaded: () => void;
@@ -10,7 +10,9 @@ export function UploadButton({ onUploaded }: Props): React.ReactElement {
   const [busy, setBusy] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
-  async function handleChange(e: React.ChangeEvent<HTMLInputElement>): Promise<void> {
+  async function handleChange(
+    e: React.ChangeEvent<HTMLInputElement>,
+  ): Promise<void> {
     const file = e.target.files?.[0];
     if (!file) return;
     setBusy(true);
@@ -19,10 +21,10 @@ export function UploadButton({ onUploaded }: Props): React.ReactElement {
       await uploadDocument(file);
       onUploaded();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'upload failed');
+      setError(err instanceof Error ? err.message : "upload failed");
     } finally {
       setBusy(false);
-      if (inputRef.current) inputRef.current.value = '';
+      if (inputRef.current) inputRef.current.value = "";
     }
   }
 
@@ -33,7 +35,7 @@ export function UploadButton({ onUploaded }: Props): React.ReactElement {
         disabled={busy}
         onClick={() => inputRef.current?.click()}
       >
-        {busy ? 'Uploading…' : '+ Upload PDF'}
+        {busy ? "Uploading…" : "+ Upload PDF"}
       </button>
       <input
         ref={inputRef}

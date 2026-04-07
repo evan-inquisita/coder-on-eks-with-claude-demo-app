@@ -1,5 +1,5 @@
-import React from 'react';
-import type { Message } from '../types';
+import React from "react";
+import type { Message } from "../types";
 
 interface Props {
   message: Message;

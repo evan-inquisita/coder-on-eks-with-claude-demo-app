@@ -4,6 +4,7 @@
 We don't hit a real Postgres or S3 here — Task 10's test_chat.py is the
 end-to-end happy-path test (skipped without BEDROCK_MODEL_ID).
 """
+
 from __future__ import annotations
 
 from typing import Any

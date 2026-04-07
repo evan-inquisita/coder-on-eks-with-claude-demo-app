@@ -1,7 +1,7 @@
-import React from 'react';
-import { listMessages, postMessage } from '../api';
-import type { Message } from '../types';
-import { MessageBubble } from './MessageBubble';
+import React from "react";
+import { listMessages, postMessage } from "../api";
+import type { Message } from "../types";
+import { MessageBubble } from "./MessageBubble";
 
 interface Props {
   documentId: string;
@@ -9,7 +9,7 @@ interface Props {
 
 export function ChatPanel({ documentId }: Props): React.ReactElement {
   const [messages, setMessages] = React.useState<Message[]>([]);
-  const [input, setInput] = React.useState('');
+  const [input, setInput] = React.useState("");
   const [busy, setBusy] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
@@ -20,7 +20,8 @@ export function ChatPanel({ documentId }: Props): React.ReactElement {
         if (!cancelled) setMessages(m);
       })
       .catch((err) => {
-        if (!cancelled) setError(err instanceof Error ? err.message : String(err));
+        if (!cancelled)
+          setError(err instanceof Error ? err.message : String(err));
       });
     return () => {
       cancelled = true;
@@ -33,13 +34,13 @@ export function ChatPanel({ documentId }: Props): React.ReactElement {
     if (!content || busy) return;
     setBusy(true);
     setError(null);
-    setMessages((prev) => [...prev, { role: 'user', content }]);
-    setInput('');
+    setMessages((prev) => [...prev, { role: "user", content }]);
+    setInput("");
     try {
       const assistant = await postMessage(documentId, content);
       setMessages((prev) => [...prev, assistant]);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'send failed');
+      setError(err instanceof Error ? err.message : "send failed");
     } finally {
       setBusy(false);
     }
@@ -48,7 +49,9 @@ export function ChatPanel({ documentId }: Props): React.ReactElement {
   return (
     <div className="chat-panel">
       <div className="chat-history">
-        {messages.length === 0 && <div className="muted">No messages yet. Ask a question to begin.</div>}
+        {messages.length === 0 && (
+          <div className="muted">No messages yet. Ask a question to begin.</div>
+        )}
         {messages.map((m, i) => (
           <MessageBubble key={i} message={m} />
         ))}
@@ -63,7 +66,7 @@ export function ChatPanel({ documentId }: Props): React.ReactElement {
           disabled={busy}
         />
         <button type="submit" disabled={busy || !input.trim()}>
-          {busy ? '…' : 'Send'}
+          {busy ? "…" : "Send"}
         </button>
       </form>
     </div>

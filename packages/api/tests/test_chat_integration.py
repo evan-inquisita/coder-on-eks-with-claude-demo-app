@@ -10,6 +10,7 @@ To run locally inside a workspace after `make up`:
     BEDROCK_MODEL_ID=us.anthropic.claude-sonnet-4-6-20250929-v1:0 \\
     uv run pytest tests/test_chat_integration.py -v -s
 """
+
 from __future__ import annotations
 
 import os
@@ -22,7 +23,11 @@ from doc_chat_api.main import build_app
 
 
 pytestmark = pytest.mark.skipif(
-    not (os.getenv("BEDROCK_MODEL_ID") and os.getenv("DATABASE_URL") and os.getenv("DOCUMENTS_BUCKET")),
+    not (
+        os.getenv("BEDROCK_MODEL_ID")
+        and os.getenv("DATABASE_URL")
+        and os.getenv("DOCUMENTS_BUCKET")
+    ),
     reason="Integration test requires BEDROCK_MODEL_ID, DATABASE_URL, DOCUMENTS_BUCKET",
 )
 

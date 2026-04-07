@@ -1,6 +1,7 @@
 # packages/api/tests/test_routes_chat.py
 """Route-shape tests for chat endpoints. Stubs out the agent so we don't
 hit Bedrock here — that's covered by Task 10's integration test."""
+
 from __future__ import annotations
 
 from typing import Any
@@ -32,9 +33,7 @@ class FakeConn:
 
     async def execute(self, query: str, *args: Any) -> str:
         if "INSERT INTO messages" in query:
-            self.store.setdefault("messages", []).append(
-                {"role": args[1], "content": args[2]}
-            )
+            self.store.setdefault("messages", []).append({"role": args[1], "content": args[2]})
         return "INSERT 1"
 
 
@@ -51,9 +50,7 @@ class FakeAcquire:
 
 class FakeDb:
     def __init__(self) -> None:
-        self.store: dict[str, Any] = {
-            "doc": {"id": DOC_ID, "s3_key": "documents/x/test.pdf"}
-        }
+        self.store: dict[str, Any] = {"doc": {"id": DOC_ID, "s3_key": "documents/x/test.pdf"}}
         self.conn = FakeConn(self.store)
 
     def acquire(self) -> FakeAcquire:

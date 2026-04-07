@@ -24,6 +24,7 @@ async def upload_document(request: Request, file: UploadFile) -> dict:
 
     # Reserve an id so the s3 key can include it
     from uuid import uuid4
+
     doc_id = uuid4()
     s3_key = s3.key_for_document(doc_id=str(doc_id), filename=filename)
 
@@ -76,9 +77,7 @@ async def delete_document(request: Request, doc_id: UUID) -> dict:
     db = request.app.state.db
     s3 = request.app.state.s3
     async with db.acquire() as conn:
-        row = await conn.fetchrow(
-            "SELECT s3_key FROM documents WHERE id = $1", doc_id
-        )
+        row = await conn.fetchrow("SELECT s3_key FROM documents WHERE id = $1", doc_id)
         if row is None:
             raise HTTPException(status_code=404, detail="document not found")
         await s3.delete_object(key=row["s3_key"])

@@ -1,6 +1,6 @@
-import React from 'react';
-import { DocumentList } from './components/DocumentList';
-import { ChatPanel } from './components/ChatPanel';
+import React from "react";
+import { DocumentList } from "./components/DocumentList";
+import { ChatPanel } from "./components/ChatPanel";
 
 export function App(): React.ReactElement {
   const [selectedId, setSelectedId] = React.useState<string | null>(null);
@@ -24,7 +24,9 @@ export function App(): React.ReactElement {
           {selectedId ? (
             <ChatPanel documentId={selectedId} />
           ) : (
-            <div className="empty">Select or upload a document to start chatting.</div>
+            <div className="empty">
+              Select or upload a document to start chatting.
+            </div>
           )}
         </main>
       </div>

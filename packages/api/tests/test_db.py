@@ -10,7 +10,9 @@ def test_database_constructor_stores_url() -> None:
 
 
 @pytest.mark.asyncio
-async def test_database_connect_disconnect_lifecycle_calls_asyncpg(monkeypatch: pytest.MonkeyPatch) -> None:
+async def test_database_connect_disconnect_lifecycle_calls_asyncpg(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """Verify Database.connect calls asyncpg.create_pool with the right DSN.
 
     We monkeypatch asyncpg.create_pool to avoid needing a real Postgres for this unit test.

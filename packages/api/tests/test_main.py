@@ -1,5 +1,6 @@
 # packages/api/tests/test_main.py
 """Smoke test that the app builds and /healthz responds."""
+
 from fastapi.testclient import TestClient
 
 from doc_chat_api.main import build_app

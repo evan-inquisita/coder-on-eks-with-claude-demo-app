@@ -4,6 +4,7 @@
 The actual Bedrock call is integration-tested in test_chat.py and skipped
 without BEDROCK_MODEL_ID. Here we just check the helpers.
 """
+
 from doc_chat_api.agents.doc_chat_agent import db_history_to_pydantic_ai_messages
 
 

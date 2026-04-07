@@ -43,9 +43,7 @@ async def post_message(request: Request, doc_id: UUID, body: PostMessageBody) ->
     chat_fn = getattr(request.app.state, "chat_fn", chat_with_document)
 
     async with db.acquire() as conn:
-        doc = await conn.fetchrow(
-            "SELECT id, s3_key FROM documents WHERE id = $1", doc_id
-        )
+        doc = await conn.fetchrow("SELECT id, s3_key FROM documents WHERE id = $1", doc_id)
         if doc is None:
             raise HTTPException(status_code=404, detail="document not found")
 
