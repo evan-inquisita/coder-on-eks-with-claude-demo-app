@@ -1,0 +1,61 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: doc_chat
+      POSTGRES_PASSWORD: doc_chat
+      POSTGRES_DB: doc_chat
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./packages/api/doc_chat_api/migrations:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U doc_chat"]
+      interval: 5s
+      retries: 10
+
+  api:
+    build:
+      context: ./packages/api
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: postgresql://doc_chat:doc_chat@postgres:5432/doc_chat
+      DOCUMENTS_BUCKET: ${DOCUMENTS_BUCKET}
+      AWS_REGION: ${AWS_REGION:-us-east-1}
+      BEDROCK_MODEL_ID: us.anthropic.claude-sonnet-4-6-20250929-v1:0
+    volumes:
+      # Bind-mount the workspace's AWS profile/creds dir so the api container
+      # picks up the IRSA → access-role chain set up by fetch-workspace-secrets.sh.
+      # The api Dockerfile creates a non-root user `api` with home /home/api,
+      # and the container runs as that user — so mount there, not /root.
+      - /home/coder/.aws:/home/api/.aws:ro
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python -c 'import urllib.request,sys; sys.exit(0 if urllib.request.urlopen(\"http://localhost:8000/healthz\").status==200 else 1)'"]
+      interval: 5s
+      retries: 10
+
+  web:
+    build:
+      context: ./packages/website
+      dockerfile: Dockerfile.dev
+    environment:
+      VITE_API_BASE_URL: /api
+    volumes:
+      - ./packages/website/src:/app/src
+      - ./packages/website/index.html:/app/index.html
+      - ./packages/website/vite.config.ts:/app/vite.config.ts
+      - ./packages/website/tsconfig.json:/app/tsconfig.json
+    ports:
+      - "5173:5173"
+    depends_on:
+      api:
+        condition: service_healthy
+
+volumes:
+  postgres-data:
