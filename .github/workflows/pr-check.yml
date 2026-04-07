@@ -1,0 +1,58 @@
+name: PR Check
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  api:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+      - name: Install api deps
+        working-directory: packages/api
+        run: |
+          $HOME/.local/bin/uv sync --extra dev
+      - name: Run api tests
+        working-directory: packages/api
+        run: |
+          $HOME/.local/bin/uv run pytest -v
+      # Note: test_chat_integration.py is auto-skipped without BEDROCK_MODEL_ID/DATABASE_URL/DOCUMENTS_BUCKET.
+
+  website:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install website deps
+        working-directory: packages/website
+        run: npm install
+      - name: Run website tests
+        working-directory: packages/website
+        run: npm test
+
+  cdk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install cdk deps
+        working-directory: packages/cdk
+        run: npm install
+      - name: Run cdk tests
+        working-directory: packages/cdk
+        run: npm test
+      - name: Synth cdk
+        working-directory: packages/cdk
+        env:
+          WORKSPACE_IRSA_ROLE_ARN: arn:aws:iam::111111111111:role/workspace-irsa-role
+          CDK_DEFAULT_ACCOUNT: '111111111111'
+          CDK_DEFAULT_REGION: us-east-1
+        run: npx cdk synth > /dev/null
