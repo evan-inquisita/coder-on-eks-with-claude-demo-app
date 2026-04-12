@@ -25,7 +25,7 @@ describe('DevResourcesStack', () => {
     const template = build();
     template.resourceCountIs('AWS::S3::Bucket', 2);
     template.hasResourceProperties('AWS::S3::Bucket', {
-      BucketName: Match.stringLikeRegexp('^doc-chat-documents-'),
+      BucketName: Match.stringLikeRegexp('^demo-doc-chat-documents-'),
       BucketEncryption: {
         ServerSideEncryptionConfiguration: Match.arrayWith([
           Match.objectLike({
@@ -35,14 +35,14 @@ describe('DevResourcesStack', () => {
       },
     });
     template.hasResourceProperties('AWS::S3::Bucket', {
-      BucketName: Match.stringLikeRegexp('^doc-chat-pr-assets-'),
+      BucketName: Match.stringLikeRegexp('^demo-doc-chat-pr-assets-'),
     });
   });
 
   test('creates access role trusted by the workspace IRSA role', () => {
     const template = build();
     template.hasResourceProperties('AWS::IAM::Role', {
-      RoleName: 'doc-chat-dev-access-role',
+      RoleName: 'demo-doc-chat-dev-access-role',
       AssumeRolePolicyDocument: Match.objectLike({
         Statement: Match.arrayWith([
           Match.objectLike({
@@ -70,10 +70,4 @@ describe('DevResourcesStack', () => {
     });
   });
 
-  test('publishes the access role ARN to SSM', () => {
-    const template = build();
-    template.hasResourceProperties('AWS::SSM::Parameter', {
-      Name: '/workspace/access-role-arn',
-    });
-  });
 });

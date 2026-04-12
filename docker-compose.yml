@@ -20,16 +20,21 @@ services:
       context: ./packages/api
       dockerfile: Dockerfile
     environment:
-      DATABASE_URL: postgresql://doc_chat:doc_chat@postgres:5432/doc_chat
-      DOCUMENTS_BUCKET: ${DOCUMENTS_BUCKET}
-      AWS_REGION: ${AWS_REGION:-us-east-1}
-      BEDROCK_MODEL_ID: us.anthropic.claude-sonnet-4-6-20250929-v1:0
+      # Locally: AWS creds injected by `make up` via `env $(CREDS)`
+      # Coder:   picked up from ~/.aws mount (IRSA role chain)
+      - DATABASE_URL=postgresql://doc_chat:doc_chat@postgres:5432/doc_chat
+      - DOCUMENTS_BUCKET=${DOCUMENTS_BUCKET}
+      - AWS_REGION=${AWS_REGION:-us-east-1}
+      - AWS_DEFAULT_REGION=${AWS_REGION:-us-east-1}
+      - BEDROCK_MODEL_ID=us.anthropic.claude-haiku-4-5-20251001-v1:0
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
+      - AWS_SESSION_TOKEN
     volumes:
-      # Bind-mount the workspace's AWS profile/creds dir so the api container
-      # picks up the IRSA → access-role chain set up by fetch-workspace-secrets.sh.
-      # The api Dockerfile creates a non-root user `api` with home /home/api,
-      # and the container runs as that user — so mount there, not /root.
-      - /home/coder/.aws:/home/api/.aws:ro
+      # Mount ~/.aws so boto3 can read the config/credentials file.
+      # In Coder workspaces this contains the IRSA role chain written by
+      # fetch-workspace-secrets.sh. Locally it has the user's SSO config.
+      - ~/.aws:/home/api/.aws:ro
     ports:
       - "8000:8000"
     depends_on:
@@ -51,8 +56,9 @@ services:
       - ./packages/website/index.html:/app/index.html
       - ./packages/website/vite.config.ts:/app/vite.config.ts
       - ./packages/website/tsconfig.json:/app/tsconfig.json
+      - ./tsconfig.base.json:/tsconfig.base.json:ro
     ports:
-      - "5173:5173"
+      - "3000:3000"
     depends_on:
       api:
         condition: service_healthy

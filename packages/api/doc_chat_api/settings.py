@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     database_url: str
     documents_bucket: str
     aws_region: str = "us-east-1"
-    bedrock_model_id: str = "us.anthropic.claude-sonnet-4-6-20250929-v1:0"
+    bedrock_model_id: str = "us.anthropic.claude-haiku-4-5-20251001-v1:0"
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

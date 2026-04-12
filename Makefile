@@ -10,14 +10,29 @@ install:
 
 up:
 	@if [ -z "$$DOCUMENTS_BUCKET" ]; then \
-	  echo "DOCUMENTS_BUCKET not set. Export it before 'make up'."; \
-	  echo "  export DOCUMENTS_BUCKET=doc-chat-documents-\$$(aws sts get-caller-identity --query Account --output text)"; \
-	  exit 1; \
+	  echo "DOCUMENTS_BUCKET not set — fetching from CloudFormation..."; \
+	  DOCUMENTS_BUCKET=$$(aws cloudformation describe-stacks \
+	    --stack-name DocChatDevResources \
+	    --query 'Stacks[0].Outputs[?OutputKey==`DocumentsBucketName`].OutputValue' \
+	    --output text 2>/dev/null); \
+	  if [ -z "$$DOCUMENTS_BUCKET" ]; then \
+	    echo "Could not fetch from CFN. Export it manually:"; \
+	    echo "  export DOCUMENTS_BUCKET=demo-doc-chat-documents-\$$(aws sts get-caller-identity --query Account --output text)"; \
+	    exit 1; \
+	  fi; \
+	  export DOCUMENTS_BUCKET; \
+	  echo "  Using DOCUMENTS_BUCKET=$$DOCUMENTS_BUCKET"; \
+	fi; \
+	CREDS=$$(aws configure export-credentials --format env 2>/dev/null | sed 's/^export //'); \
+	if [ -z "$$CREDS" ]; then \
+	  echo "WARNING: Could not extract AWS credentials (SSO expired?). AWS calls may fail."; \
+	  DOCUMENTS_BUCKET=$${DOCUMENTS_BUCKET} docker compose up -d --build; \
+	else \
+	  env $$CREDS DOCUMENTS_BUCKET=$${DOCUMENTS_BUCKET} docker compose up -d --build; \
 	fi
-	docker compose up -d --build
 	@echo ""
 	@echo "API:  http://localhost:8000  (healthz: http://localhost:8000/healthz)"
-	@echo "Web:  http://localhost:5173"
+	@echo "Web:  http://localhost:3000"
 	@echo ""
 	@echo "Inside a Coder workspace, use the preview-urls skill to get the public URLs."
 
