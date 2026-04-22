@@ -106,6 +106,25 @@ def test_upload_document_returns_id_and_name(client: TestClient) -> None:
     UUID(body["id"])  # parses
 
 
+def test_get_document_file_returns_pdf(client: TestClient) -> None:
+    pdf_bytes = b"%PDF-1.4 fake content"
+    files = {"file": ("sample.pdf", pdf_bytes, "application/pdf")}
+    upload_resp = client.post("/documents", files=files)
+    doc_id = upload_resp.json()["id"]
+
+    response = client.get(f"/documents/{doc_id}/file")
+    assert response.status_code == 200
+    assert response.headers["content-type"] == "application/pdf"
+    assert response.content == pdf_bytes
+
+
+def test_get_document_file_404(client: TestClient) -> None:
+    from uuid import uuid4
+
+    response = client.get(f"/documents/{uuid4()}/file")
+    assert response.status_code == 404
+
+
 def test_list_documents_returns_uploaded(client: TestClient) -> None:
     client.post("/documents", files={"file": ("a.pdf", b"x", "application/pdf")})
     client.post("/documents", files={"file": ("b.pdf", b"y", "application/pdf")})

@@ -9,6 +9,7 @@ from __future__ import annotations
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, Request, UploadFile
+from fastapi.responses import Response
 
 router = APIRouter(prefix="/documents", tags=["documents"])
 
@@ -70,6 +71,21 @@ async def get_document(request: Request, doc_id: UUID) -> dict:
     if row is None:
         raise HTTPException(status_code=404, detail="document not found")
     return {"id": str(row["id"]), "name": row["name"]}
+
+
+@router.get("/{doc_id}/file")
+async def get_document_file(request: Request, doc_id: UUID) -> Response:
+    db = request.app.state.db
+    s3 = request.app.state.s3
+    async with db.acquire() as conn:
+        row = await conn.fetchrow(
+            "SELECT s3_key FROM documents WHERE id = $1",
+            doc_id,
+        )
+    if row is None:
+        raise HTTPException(status_code=404, detail="document not found")
+    body = await s3.get_object(key=row["s3_key"])
+    return Response(content=body, media_type="application/pdf")
 
 
 @router.delete("/{doc_id}")
