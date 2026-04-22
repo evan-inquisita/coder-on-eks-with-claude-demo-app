@@ -115,3 +115,20 @@ def test_list_documents_returns_uploaded(client: TestClient) -> None:
     assert len(docs) == 2
     names = sorted(d["name"] for d in docs)
     assert names == ["a.pdf", "b.pdf"]
+
+
+def test_get_document_content_returns_pdf(client: TestClient) -> None:
+    pdf_bytes = b"%PDF-1.4 fake content"
+    upload = client.post("/documents", files={"file": ("sample.pdf", pdf_bytes, "application/pdf")})
+    doc_id = upload.json()["id"]
+    response = client.get(f"/documents/{doc_id}/content")
+    assert response.status_code == 200
+    assert response.headers["content-type"] == "application/pdf"
+    assert response.content == pdf_bytes
+
+
+def test_get_document_content_404(client: TestClient) -> None:
+    from uuid import uuid4
+
+    response = client.get(f"/documents/{uuid4()}/content")
+    assert response.status_code == 404

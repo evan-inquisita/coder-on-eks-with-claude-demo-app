@@ -102,6 +102,34 @@ body {
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.doc-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.preview-btn {
+  flex-shrink: 0;
+  padding: 2px 8px;
+  font-size: 12px;
+  background: white;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.document-list li:hover .preview-btn,
+.document-list li.selected .preview-btn {
+  opacity: 1;
 }
 
 .document-list li:hover {
@@ -111,6 +139,66 @@ body {
 .document-list li.selected {
   background: #dbeafe;
   font-weight: 500;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.modal {
+  background: white;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  width: 80vw;
+  height: 88vh;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  gap: 12px;
+}
+
+.modal-title {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: var(--muted);
+  padding: 4px 8px;
+  border-radius: 4px;
+  line-height: 1;
+}
+
+.modal-close:hover {
+  background: var(--bg);
+  color: var(--fg);
+}
+
+.modal-pdf {
+  flex: 1;
+  width: 100%;
+  border: none;
 }
 
 .chat-panel {
