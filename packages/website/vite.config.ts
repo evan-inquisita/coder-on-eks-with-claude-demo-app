@@ -16,7 +16,7 @@ export default defineConfig({
     port: 3000,
     watch: { usePolling: true, interval: 200 },
     hmr: isCoder ? { clientPort: 443 } : {},
-    allowedHosts: 'all',
+    allowedHosts: true,
     proxy: {
       '/api': {
         target: 'http://api:8000',
